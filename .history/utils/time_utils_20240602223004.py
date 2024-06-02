@@ -901,17 +901,12 @@ class ControlNodeWarp(nn.Module):
             print('Initialization with all pcl. Need to reset the optimizer.')
         else:
             pcl_to_samp = init_pcl if hyper_pcl is None else hyper_pcl
-            bridge = False  # TODO:
             if not bridge:
                # pcl_to_samp N,3
-               # init_nodes_idx T,
-               breakpoint()
+               # init_nodes_i,
                init_nodes_idx = farthest_point_sample(pcl_to_samp.detach()[None], self.node_num)[0]
+               breakpoint()
             else:
-                # TODO:
-                # 1. get the nodes and the deformed nodes in every frame F, N, 3 (use the available pdb to help you)
-                # 2. perform rough sampling, use paired distance as weight and graph cutting and clustering (to get new node?)
-                # 3. replace those nodes, maybe need to modify the indexing too
                 print('Using custom bridge algorithm')
                 raise NotImplementedError()
             self.nodes.data = nn.Parameter(torch.cat([init_pcl[init_nodes_idx].float(), 1e-2 * torch.ones([self.node_num, self.hyper_dim]).float().cuda()], dim=-1))

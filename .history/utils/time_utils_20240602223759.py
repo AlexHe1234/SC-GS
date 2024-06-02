@@ -909,7 +909,7 @@ class ControlNodeWarp(nn.Module):
                init_nodes_idx = farthest_point_sample(pcl_to_samp.detach()[None], self.node_num)[0]
             else:
                 # TODO:
-                # 1. get the nodes and the deformed nodes in every frame F, N, 3 (use the available pdb to help you)
+                # 1. get the nodes and the deformed nodes in every frame F, N, 3 (use the available pdb to help ypi)
                 # 2. perform rough sampling, use paired distance as weight and graph cutting and clustering (to get new node?)
                 # 3. replace those nodes, maybe need to modify the indexing too
                 print('Using custom bridge algorithm')
