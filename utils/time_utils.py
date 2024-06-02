@@ -883,7 +883,7 @@ class ControlNodeWarp(nn.Module):
     def node_num(self):
         return self.nodes.shape[0]
     
-    def init(self, opt, init_pcl, hyper_pcl=None, keep_all=False, force_init=False, as_gs_force_with_motion_mask=False, force_gs_keep_all=False, reset_bbox=True, **kwargs):
+    def init(self, opt, init_pcl, hyper_pcl=None, keep_all=False, force_init=False, as_gs_force_with_motion_mask=False, force_gs_keep_all=False, reset_bbox=True, bridge=False, **kwargs):
         # keep_all: initialize nodes with all init_pcl given. it happens when sample nodes from the isotropic Gaussians right after the node training
         # force_gs_keep_all: initialize isotropic Gaussians with all init_pcl given. it happens in the very beginning of the training.
 
@@ -901,7 +901,11 @@ class ControlNodeWarp(nn.Module):
             print('Initialization with all pcl. Need to reset the optimizer.')
         else:
             pcl_to_samp = init_pcl if hyper_pcl is None else hyper_pcl
-            init_nodes_idx = farthest_point_sample(pcl_to_samp.detach()[None], self.node_num)[0]
+            if not bridge:
+               init_nodes_idx = farthest_point_sample(pcl_to_samp.detach()[None], self.node_num)[0]
+            else:
+                print('Using custom bridge algorithm')
+                raise NotImplementedError()
             self.nodes.data = nn.Parameter(torch.cat([init_pcl[init_nodes_idx].float(), 1e-2 * torch.ones([self.node_num, self.hyper_dim]).float().cuda()], dim=-1))
         scene_range = init_pcl.max() - init_pcl.min()
         if self.skinning:

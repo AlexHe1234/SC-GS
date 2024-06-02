@@ -143,7 +143,23 @@ class GUI:
             print(f'Progressive trian is on. Adjusting the iterations node sampling to {self.opt.iterations_node_sampling} and iterations node rendering {self.opt.iterations_node_rendering}')
 
         self.tb_writer = prepare_output_and_logger(dataset)
-        self.deform = DeformModel(K=self.dataset.K, deform_type=self.dataset.deform_type, is_blender=self.dataset.is_blender, skinning=self.args.skinning, hyper_dim=self.dataset.hyper_dim, node_num=self.dataset.node_num, pred_opacity=self.dataset.pred_opacity, pred_color=self.dataset.pred_color, use_hash=self.dataset.use_hash, hash_time=self.dataset.hash_time, d_rot_as_res=self.dataset.d_rot_as_res and not self.dataset.d_rot_as_rotmat, local_frame=self.dataset.local_frame, progressive_brand_time=self.dataset.progressive_brand_time, with_arap_loss=not self.opt.no_arap_loss, max_d_scale=self.dataset.max_d_scale, enable_densify_prune=self.opt.node_enable_densify_prune, is_scene_static=dataset.is_scene_static)
+        self.deform = DeformModel(K=self.dataset.K, 
+                                  deform_type=self.dataset.deform_type, 
+                                  is_blender=self.dataset.is_blender,
+                                  skinning=self.args.skinning, 
+                                  hyper_dim=self.dataset.hyper_dim, 
+                                  node_num=self.dataset.node_num, 
+                                  pred_opacity=self.dataset.pred_opacity, 
+                                  pred_color=self.dataset.pred_color, 
+                                  use_hash=self.dataset.use_hash, 
+                                  hash_time=self.dataset.hash_time, 
+                                  d_rot_as_res=self.dataset.d_rot_as_res and not self.dataset.d_rot_as_rotmat, 
+                                  local_frame=self.dataset.local_frame, 
+                                  progressive_brand_time=self.dataset.progressive_brand_time, 
+                                  with_arap_loss=not self.opt.no_arap_loss, 
+                                  max_d_scale=self.dataset.max_d_scale, 
+                                  enable_densify_prune=self.opt.node_enable_densify_prune, 
+                                  is_scene_static=dataset.is_scene_static)
         deform_loaded = self.deform.load_weights(dataset.model_path, iteration=-1)
         self.deform.train_setting(opt)
 
@@ -1061,7 +1077,7 @@ class GUI:
         elif self.deform.name == 'node':
             if not self.deform.deform.inited:
                 print('Notice that warping nodes are initialized with Gaussians!!!')
-                self.deform.deform.init(self.opt, self.gaussians.get_xyz.detach(), feature=self.gaussians.feature)
+                self.deform.deform.init(self.opt, self.gaussians.get_xyz.detach(), feature=self.gaussians.feature, bridge=True)
             time_input = self.deform.deform.expand_time(fid)
             N = time_input.shape[0]
             ast_noise = 0 if self.dataset.is_blender else torch.randn(1, 1, device='cuda').expand(N, -1) * time_interval * self.smooth_term(self.iteration)
