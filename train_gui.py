@@ -1264,7 +1264,9 @@ class GUI:
 
         ast_noise = 0 if self.dataset.is_blender else torch.randn(1, 1, device='cuda').expand(N, -1) * time_interval * self.smooth_term(self.iteration_node_rendering)
         d_values = self.deform.deform.query_network(x=self.deform.deform.as_gaussians.get_xyz.detach(), t=time_input + ast_noise)
-        d_xyz, d_opacity, d_color = d_values['d_xyz'] * self.deform.deform.as_gaussians.motion_mask, d_values['d_opacity'] * self.deform.deform.as_gaussians.motion_mask if d_values['d_opacity'] is not None else None, d_values['d_color'] * self.deform.deform.as_gaussians.motion_mask if d_values['d_color'] is not None else None
+        d_xyz, d_opacity, d_color = d_values['d_xyz'] * self.deform.deform.as_gaussians.motion_mask, \
+            d_values['d_opacity'] * self.deform.deform.as_gaussians.motion_mask if d_values['d_opacity'] is not None else None, \
+                d_values['d_color'] * self.deform.deform.as_gaussians.motion_mask if d_values['d_color'] is not None else None
         d_rot, d_scale = 0., 0.
         if self.iteration_node_rendering < self.opt.node_warm_up:
             d_xyz = d_xyz.detach()
