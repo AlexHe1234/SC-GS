@@ -1075,9 +1075,10 @@ class GUI:
                 d_values = self.deform.step(self.gaussians.get_xyz.detach(), time_input + ast_noise, iteration=self.iteration, feature=self.gaussians.feature, camera_center=viewpoint_cam.camera_center)
                 d_xyz, d_rotation, d_scaling, d_opacity, d_color = d_values['d_xyz'], d_values['d_rotation'], d_values['d_scaling'], d_values['d_opacity'], d_values['d_color']
         elif self.deform.name == 'node':
-            if not self.deform.deform.inited:
-                print('Notice that warping nodes are initialized with Gaussians!!!')
-                self.deform.deform.init(self.opt, self.gaussians.get_xyz.detach(), feature=self.gaussians.feature, bridge=True)
+            # if not self.deform.deform.inited:
+            # TODO:
+            print('Notice that warping nodes are initialized with Gaussians!!!')
+            self.deform.deform.init(self.opt, self.gaussians.get_xyz.detach(), feature=self.gaussians.feature, bridge=True)
             time_input = self.deform.deform.expand_time(fid)
             N = time_input.shape[0]
             ast_noise = 0 if self.dataset.is_blender else torch.randn(1, 1, device='cuda').expand(N, -1) * time_interval * self.smooth_term(self.iteration)
@@ -1357,7 +1358,6 @@ class GUI:
                     print('Reset the optimizer of the deform model.')
                     self.deform.train_setting(self.opt)
                 elif strategy == 'samp_hyper':
-                    # breakpoint()
                     original_gaussians: GaussianModel = self.deform.deform.as_gaussians
                     time_num = 16
                     t_samp = torch.linspace(0, 1, time_num).cuda()
@@ -1371,7 +1371,7 @@ class GUI:
                     dynamic_mask = self.deform.deform.as_gaussians.motion_mask[..., 0] > .5
                     if not self.opt.deform_downsamp_with_dynamic_mask:
                         dynamic_mask = torch.ones_like(dynamic_mask)
-                    idx = self.deform.deform.init(init_pcl=original_gaussians.get_xyz[dynamic_mask], hyper_pcl=hyper_pcl[dynamic_mask], force_init=True, opt=self.opt, reset_bbox=False, feature=self.gaussians.feature, bridge=True)
+                    idx = self.deform.deform.init(init_pcl=original_gaussians.get_xyz[dynamic_mask], hyper_pcl=hyper_pcl[dynamic_mask], force_init=True, opt=self.opt, reset_bbox=False, feature=self.gaussians.feature)
                     gaussians: GaussianModel = self.deform.deform.as_gaussians
                     gaussians._features_dc = torch.nn.Parameter(original_gaussians._features_dc[dynamic_mask][idx])
                     gaussians._features_rest = torch.nn.Parameter(original_gaussians._features_rest[dynamic_mask][idx])

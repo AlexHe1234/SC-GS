@@ -1357,7 +1357,6 @@ class GUI:
                     print('Reset the optimizer of the deform model.')
                     self.deform.train_setting(self.opt)
                 elif strategy == 'samp_hyper':
-                    # breakpoint()
                     original_gaussians: GaussianModel = self.deform.deform.as_gaussians
                     time_num = 16
                     t_samp = torch.linspace(0, 1, time_num).cuda()
@@ -1371,7 +1370,7 @@ class GUI:
                     dynamic_mask = self.deform.deform.as_gaussians.motion_mask[..., 0] > .5
                     if not self.opt.deform_downsamp_with_dynamic_mask:
                         dynamic_mask = torch.ones_like(dynamic_mask)
-                    idx = self.deform.deform.init(init_pcl=original_gaussians.get_xyz[dynamic_mask], hyper_pcl=hyper_pcl[dynamic_mask], force_init=True, opt=self.opt, reset_bbox=False, feature=self.gaussians.feature, bridge=True)
+                    idx = self.deform.deform.init(init_pcl=original_gaussians.get_xyz[dynamic_mask], hyper_pcl=hyper_pcl[dynamic_mask], force_init=True, opt=self.opt, reset_bbox=False, feature=self.gaussians.feature)
                     gaussians: GaussianModel = self.deform.deform.as_gaussians
                     gaussians._features_dc = torch.nn.Parameter(original_gaussians._features_dc[dynamic_mask][idx])
                     gaussians._features_rest = torch.nn.Parameter(original_gaussians._features_rest[dynamic_mask][idx])

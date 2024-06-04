@@ -131,8 +131,8 @@ class OptimizationParams(ParamGroup):
 
         self.random_init_deform_gs = False
         self.node_warm_up = 2_000
-        self.iterations_node_sampling = 7500  
-        self.iterations_node_rendering = 7501# TODO:10_000
+        self.iterations_node_sampling = 75000  # TODO:7500
+        self.iterations_node_rendering = 10000
 
         self.progressive_train = False
         self.progressive_train_node = False

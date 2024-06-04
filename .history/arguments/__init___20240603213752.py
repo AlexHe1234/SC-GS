@@ -124,15 +124,15 @@ class OptimizationParams(ParamGroup):
         self.deform_downsamp_with_dynamic_mask = False
         self.node_enable_densify_prune = False
         self.node_densification_interval = 5000
-        self.node_densify_from_iter = 100000# TODO:1000
+        self.node_densify_from_iter = 1000
         self.node_densify_until_iter = 25_000
-        self.node_force_densify_prune_step = 10_0000# TODO:10_000
+        self.node_force_densify_prune_step = 10_000
         self.node_max_num_ratio_during_init = 16
 
         self.random_init_deform_gs = False
         self.node_warm_up = 2_000
-        self.iterations_node_sampling = 7500  
-        self.iterations_node_rendering = 7501# TODO:10_000
+        self.iterations_node_sampling = 75000  # TODO:7500
+        self.iterations_node_rendering = 10000
 
         self.progressive_train = False
         self.progressive_train_node = False

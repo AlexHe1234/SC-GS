@@ -901,14 +901,13 @@ class ControlNodeWarp(nn.Module):
             print('Initialization with all pcl. Need to reset the optimizer.')
         else:
             pcl_to_samp = init_pcl if hyper_pcl is None else hyper_pcl
-            # bridge = False  # TODO:
+            bridge = False  # TODO:
             if not bridge:
                 # pcl_to_samp N,3
                 # init_nodes_idx T,
                 # breakpoint()
                 print('this shouldnt be happenings')
                 init_nodes_idx = farthest_point_sample(pcl_to_samp.detach()[None], self.node_num)[0]
-                node_num = self.node_num
             else:
                 # TODO:
                 # 1. get the nodes and the deformed nodes in every frame F, N, 3 (use the available pdb to help you)
@@ -916,11 +915,10 @@ class ControlNodeWarp(nn.Module):
                 # 3. replace those nodes, maybe need to modify the indexing too
                 # print('Using custom bridge algorithm')
                 # raise NotImplementedError()
-                print('going to 16')
-                node_num = 16
-                init_nodes_idx = farthest_point_sample(pcl_to_samp.detach()[None], node_num)[0]
+                self.node_num = 16
+                init_nodes_idx = farthest_point_sample(pcl_to_samp.detach()[None], self.node_num)[0]
             
-            self.nodes.data = nn.Parameter(torch.cat([init_pcl[init_nodes_idx].float(), 1e-2 * torch.ones([node_num, self.hyper_dim]).float().cuda()], dim=-1))
+            self.nodes.data = nn.Parameter(torch.cat([init_pcl[init_nodes_idx].float(), 1e-2 * torch.ones([self.node_num, self.hyper_dim]).float().cuda()], dim=-1))
         scene_range = init_pcl.max() - init_pcl.min()
         if self.skinning:
             if 'feature' in kwargs:

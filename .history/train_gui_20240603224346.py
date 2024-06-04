@@ -1357,7 +1357,7 @@ class GUI:
                     print('Reset the optimizer of the deform model.')
                     self.deform.train_setting(self.opt)
                 elif strategy == 'samp_hyper':
-                    # breakpoint()
+                    breakpoint()
                     original_gaussians: GaussianModel = self.deform.deform.as_gaussians
                     time_num = 16
                     t_samp = torch.linspace(0, 1, time_num).cuda()
