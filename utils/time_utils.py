@@ -1003,6 +1003,7 @@ class ControlNodeWarp(nn.Module):
 
     def query_network(self, x, t, **kwargs):
         values = self.network(x=x, t=t, **kwargs)
+        breakpoint()
         return values
     
     def node_deform(self, t, detach_node=True, **kwargs):
