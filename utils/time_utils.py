@@ -6,6 +6,7 @@ import pytorch3d.ops
 import numpy as np
 import os
 from utils.deform_utils import cal_connectivity_from_points, cal_arap_error, arap_deformation_loss
+from utils.structure_deform import DeformNetwork
 
 try:
     from torch_batch_svd import svd
@@ -307,7 +308,7 @@ class StaticNetwork(nn.Module):
         return
 
 
-class DeformNetwork(nn.Module):
+class DeformNetworkOld(nn.Module):
     def __init__(self, D=8, W=256, input_ch=3, output_ch=59, t_multires=6, multires=10,
                  is_blender=False, local_frame=False, pred_opacity=False, pred_color=False, resnet_color=True, hash_color=False, color_wrt_dir=False, progressive_brand_time=False, max_d_scale=-1, **kwargs):  # t_multires 6 for D-NeRF; 10 for HyperNeRF
         super(DeformNetwork, self).__init__()
@@ -802,14 +803,14 @@ class ControlNodeWarp(nn.Module):
         else:
             self.network = DeformNetwork(is_blender=is_blender, local_frame=local_frame, pred_opacity=pred_opacity, pred_color=pred_color, progressive_brand_time=progressive_brand_time, max_d_scale=max_d_scale).cuda()
         
-        self.register_buffer('inited', torch.tensor(False))
-        self.nodes = nn.Parameter(torch.randn(node_num, 3+self.hyper_dim))
+        self.register_buffer('inited', torch.tensor(True))
+        self.nodes = self.network.get_nodes()
         if not self.skinning:
             self._node_radius = nn.Parameter(torch.randn(node_num))
             if self.with_node_weight:
                 self._node_weight = nn.Parameter(torch.zeros_like(self.nodes[:, :1]), requires_grad=with_node_weight)
-        if init_pcl is not None:
-            self.init(init_pcl)
+        # if init_pcl is not None:
+        #     self.init(init_pcl)
 
         # Node colors for visualization
         self.nodes_color_visualization = torch.ones_like(self.nodes)
@@ -823,23 +824,22 @@ class ControlNodeWarp(nn.Module):
     
     def trainable_parameters(self):
         if self.skinning:
-            return [{'params': list(self.network.parameters()), 'name': 'deform'},
-                    {'params': [self.nodes], 'name': 'nodes'}]
+            return [{'params': list(self.network.parameters()), 'name': 'deform'}]
         elif self.with_node_weight:
             return [{'params': list(self.network.parameters()), 'name': 'deform'},
-                    {'params': [self.nodes, self._node_radius, self._node_weight], 'name': 'nodes'}]
+                    {'params': [self._node_radius, self._node_weight], 'name': 'nodes'}]
         else:
             return [{'params': list(self.network.parameters()), 'name': 'deform'},
-                    {'params': [self.nodes, self._node_radius], 'name': 'nodes'}]
+                    {'params': [self._node_radius], 'name': 'nodes'}]
     
     @property
     def param_names(self):
         if self.skinning:
-            param_names = ['nodes', 'deform']
+            param_names = ['deform']
         elif self.with_node_weight:
-            param_names = ['nodes', '_node_radius', '_node_weight']
+            param_names = ['_node_radius', '_node_weight']
         else:
-            param_names = ['nodes', '_node_radius']
+            param_names = ['_node_radius']
         return param_names
 
     def load_state_dict(self, state_dict: Mapping[str, Any], strict: bool = True):
@@ -886,7 +886,7 @@ class ControlNodeWarp(nn.Module):
     def init(self, opt, init_pcl, hyper_pcl=None, keep_all=False, force_init=False, as_gs_force_with_motion_mask=False, force_gs_keep_all=False, reset_bbox=True, bridge=False, **kwargs):
         # keep_all: initialize nodes with all init_pcl given. it happens when sample nodes from the isotropic Gaussians right after the node training
         # force_gs_keep_all: initialize isotropic Gaussians with all init_pcl given. it happens in the very beginning of the training.
-
+        return
         # Initialize Nodes
         if self.inited and not force_init:
             return
@@ -945,8 +945,8 @@ class ControlNodeWarp(nn.Module):
         return init_nodes_idx
 
     def expand_time(self, t):
-        N = self.nodes.shape[0]
-        t = t.unsqueeze(0).expand(N, -1)
+        # N = self.nodes.shape[0]
+        # t = t.unsqueeze(0).expand(N, -1)
         return t
 
     def cal_nn_weight(self, x:torch.Tensor, K=None, feature=None, nodes=None, gs_kernel=True, temperature=1.):
@@ -1002,11 +1002,12 @@ class ControlNodeWarp(nn.Module):
         return knn_weight, knn_dist, knn_idxs
 
     def query_network(self, x, t, **kwargs):
-        values = self.network(x=x, t=t, **kwargs)
-        breakpoint()
+        values = self.network(t=t, **kwargs)
+        # breakpoint()
         return values
     
     def node_deform(self, t, detach_node=True, **kwargs):
+        t = t.flatten()[0]
         tshape = t.shape
         if t.dim() == 3:
             assert t.shape[0] == self.node_num, f'Shape of t {t.shape} does not match the shape of nodes {self.nodes.shape}'
