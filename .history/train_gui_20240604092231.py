@@ -751,7 +751,7 @@ class GUI:
                 delta = 0.00010 * self.cam.rot.as_matrix()[:3, :3] @ np.array([dx, -dy, 0])
                 self.deform_keypoints.update_delta(delta)
                 self.need_update_overlay = True
-            #? can we override arap like this
+
             if self.deform_mode.startswith("arap"):
                 with torch.no_grad():
                     if self.deform_mode == "arap_from_init" or self.animation_trans_bias is None:
@@ -1381,7 +1381,7 @@ class GUI:
                     if gaussians.fea_dim > 0:
                         gaussians.feature = torch.nn.Parameter(original_gaussians.feature[dynamic_mask][idx])
                     gaussians.training_setup(self.opt)
-                    self.deform.train_setting(self.opt)  #TODO:
+                    self.deform.train_setting(self.opt)  #todo:
 
                 # No update at the step
                 self.deform.deform.as_gaussians.optimizer.zero_grad(set_to_none=True)

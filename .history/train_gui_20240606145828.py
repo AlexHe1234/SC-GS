@@ -752,6 +752,7 @@ class GUI:
                 self.deform_keypoints.update_delta(delta)
                 self.need_update_overlay = True
             #? can we override arap like this
+            break
             if self.deform_mode.startswith("arap"):
                 with torch.no_grad():
                     if self.deform_mode == "arap_from_init" or self.animation_trans_bias is None:

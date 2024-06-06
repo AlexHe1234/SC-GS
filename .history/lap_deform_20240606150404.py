@@ -224,8 +224,6 @@ class LapDeform(nn.Module):
     #         return deformed_p, deformed_r, deformed_s
         
     def deform_arap(self, handle_idx, handle_pos, init_verts=None, return_R=False):
-        print('hey yo')
-        
         handle_idx = torch.tensor(handle_idx).long().cuda()
         if type(handle_pos) is not torch.Tensor:
             handle_pos = torch.from_numpy(handle_pos).float().cuda()

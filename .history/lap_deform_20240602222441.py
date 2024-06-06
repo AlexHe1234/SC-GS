@@ -209,23 +209,7 @@ class LapDeform(nn.Module):
             handle_pos = torch.cat([handle_pos.cuda(), static_pos.cuda()], dim=0)
         return lstsq_with_handles(A=self.L, b=b, handle_idx=handle_idx, handle_pos=handle_pos)
     
-    # def deform_arap(self, handle_idx, handle_pos, init_verts=None, return_R=False):
-    #     handle_idx = torch.tensor(handle_idx).long().cuda()
-    #     if type(handle_pos) is not torch.Tensor:
-    #         handle_pos = torch.from_numpy(handle_pos).float().cuda()
-    #     deformed_p, deformed_r, deformed_s = self.arap_deformer.deform(handle_idx, handle_pos, init_verts=init_verts, return_R=return_R)
-    #     if self.mask_control_points:
-    #         deformed_p_all = self.init_pcl.clone()
-    #         deformed_p_all[self.init_pcl_mask] = deformed_p
-    #         deformed_r_all = torch.tensor([[1,0,0,0]]).to(deformed_r.dtype).to(deformed_r.device).repeat(deformed_p_all.shape[0],1)
-    #         deformed_r_all[self.init_pcl_mask] = deformed_r
-    #         return deformed_p_all, deformed_r_all, deformed_s
-    #     else:
-    #         return deformed_p, deformed_r, deformed_s
-        
     def deform_arap(self, handle_idx, handle_pos, init_verts=None, return_R=False):
-        print('hey yo')
-        
         handle_idx = torch.tensor(handle_idx).long().cuda()
         if type(handle_pos) is not torch.Tensor:
             handle_pos = torch.from_numpy(handle_pos).float().cuda()

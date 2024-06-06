@@ -917,7 +917,7 @@ class ControlNodeWarp(nn.Module):
                 # print('Using custom bridge algorithm')
                 # raise NotImplementedError()
                 print('going to 16')
-                node_num = 10
+                node_num = 4
                 init_nodes_idx = farthest_point_sample(pcl_to_samp.detach()[None], node_num)[0]
             
             self.nodes.data = nn.Parameter(torch.cat([init_pcl[init_nodes_idx].float(), 1e-2 * torch.ones([node_num, self.hyper_dim]).float().cuda()], dim=-1))

@@ -751,7 +751,7 @@ class GUI:
                 delta = 0.00010 * self.cam.rot.as_matrix()[:3, :3] @ np.array([dx, -dy, 0])
                 self.deform_keypoints.update_delta(delta)
                 self.need_update_overlay = True
-            #? can we override arap like this
+
             if self.deform_mode.startswith("arap"):
                 with torch.no_grad():
                     if self.deform_mode == "arap_from_init" or self.animation_trans_bias is None:
